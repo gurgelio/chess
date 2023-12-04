@@ -1,0 +1,1 @@
+const stockfish = require('stockfish')

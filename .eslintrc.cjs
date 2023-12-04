@@ -1,37 +1,31 @@
 module.exports = {
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
   env: {
     browser: true,
-    es2021: true
+    es2021: true,
   },
   extends: [
-    'plugin:react/recommended',
-    'standard-with-typescript'
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "plugin:react-hooks/recommended",
+    "prettier",
   ],
-  overrides: [],
+  parser: "@typescript-eslint/parser",
   parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    tsconfigRootDir: __dirname,
-    project: [
-      './tsconfig.json',
-      './tsconfig.node.json'
-    ]
+    ecmaVersion: "latest",
+    sourceType: "module",
+    ecmaFeatures: {
+      jsx: true,
+    },
   },
-  plugins: [
-    'react'
-  ],
+  plugins: ["@typescript-eslint", "react", "react-hooks", "react-refresh"],
   rules: {
-    'react/react-in-jsx-scope': 'off',
-    'space-before-function-paren': [
-      'error',
-      'never'
-    ],
-    '@typescript-eslint/space-before-function-paren': [
-      'error',
-      'never'
-    ],
-    '@typescript-eslint/explicit-function-return-type': 'off',
-    '@typescript-eslint/strict-boolean-expressions': 'off',
-    '@typescript-eslint/no-non-null-assertion': 'off' // ao usar '!', por favor adicione um comentário explicando porque o valor não pode ser null
+    "react-refresh/only-export-components": "warn"
   }
-}
+};
