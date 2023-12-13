@@ -1,43 +1,56 @@
-import { Color, Piece } from "./types";
+import { SquareInfo } from "../frontend/types";
+import Piece from "./piece";
 
 export default class Board {
-	bitboards: bigint[] = [];
-	squares: Piece[] = new Array(64).fill(Piece.None);
+	bitboards;
+	squares: Piece[];
 
-	constructor() {
-		this.bitboards[Color.White | Piece.Pawn] = 0n;
-		this.bitboards[Color.White | Piece.Knight] = 0n;
-		this.bitboards[Color.White | Piece.Bishop] = 0n;
-		this.bitboards[Color.White | Piece.Rook] = 0n;
-		this.bitboards[Color.White | Piece.Queen] = 0n;
-		this.bitboards[Color.White | Piece.King] = 0n;
-		this.bitboards[Color.Black | Piece.Pawn] = 0n;
-		this.bitboards[Color.Black | Piece.Knight] = 0n;
-		this.bitboards[Color.Black | Piece.Bishop] = 0n;
-		this.bitboards[Color.Black | Piece.Rook] = 0n;
-		this.bitboards[Color.Black | Piece.Queen] = 0n;
-		this.bitboards[Color.Black | Piece.King] = 0n;
+	constructor(
+		bitboards: bigint[] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n],
+		squares: Piece[] = new Array(64).fill(Piece.None),
+	) {
+		this.bitboards = bitboards;
+		this.squares = squares;
 	}
 
 	whiteBitBoard() {
 		return (
-			this.bitboards[Color.White + Piece.Pawn] |
-			this.bitboards[Color.White + Piece.Knight] |
-			this.bitboards[Color.White + Piece.Bishop] |
-			this.bitboards[Color.White + Piece.Rook] |
-			this.bitboards[Color.White + Piece.Queen] |
-			this.bitboards[Color.White + Piece.King]
+			this.bitboards[Piece.WhitePawn] |
+			this.bitboards[Piece.WhiteKnight] |
+			this.bitboards[Piece.WhiteBishop] |
+			this.bitboards[Piece.WhiteRook] |
+			this.bitboards[Piece.WhiteQueen] |
+			this.bitboards[Piece.WhiteKing]
 		);
 	}
 
 	blackBitBoard() {
 		return (
-			this.bitboards[Color.Black + Piece.Pawn] |
-			this.bitboards[Color.Black + Piece.Knight] |
-			this.bitboards[Color.Black + Piece.Bishop] |
-			this.bitboards[Color.Black + Piece.Rook] |
-			this.bitboards[Color.Black + Piece.Queen] |
-			this.bitboards[Color.Black + Piece.King]
+			this.bitboards[Piece.BlackPawn] |
+			this.bitboards[Piece.BlackKnight] |
+			this.bitboards[Piece.BlackBishop] |
+			this.bitboards[Piece.BlackRook] |
+			this.bitboards[Piece.BlackQueen] |
+			this.bitboards[Piece.BlackKing]
 		);
+	}
+
+	move(from: SquareInfo, to: SquareInfo) {
+		this.updateBitboards(from, to);
+		this.updateSquares(from, to);
+	}
+
+	private updateSquares(from: SquareInfo, to: SquareInfo) {
+		this.squares[to.square] = this.squares[from.square];
+		this.squares[from.square] = Piece.None;
+		this.squares = [...this.squares];
+	}
+
+	private updateBitboards(from: SquareInfo, to: SquareInfo) {
+		this.bitboards[from.piece] ^=
+			(1n << BigInt(from.square)) | (1n << BigInt(to.square));
+		if (to.piece !== Piece.None) {
+			this.bitboards[to.piece] ^= BigInt(1 << to.square);
+		}
 	}
 }

@@ -1,7 +1,7 @@
 import z from "zod";
+import { Castle } from "../frontend/types";
 import Board from "./board";
-import Game, { Castle } from "./game";
-import { Color, Piece } from "./types";
+import Piece from "./piece";
 
 const boardValidator = z
 	.string()
@@ -21,33 +21,41 @@ const whoIsToPlayValidator = z.string().length(1).regex(/(w|b)/);
 const castleValidator = z.string().regex(/(-|K?Q?k?q?)/);
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-export default function loadPosition(fen: string) {
+export default function loadFen(fen: string) {
+	console.log("loading fen...");
 	const [board, whoIsToPlay, castle, enPassant, fiftyMoveRuleCount, moveCount] =
 		fen.split(" ");
 
-	return new Game({
+	return {
 		board: parseBoard(board),
 		isWhiteToMove: parseIsWhiteToMove(whoIsToPlay),
 		availableCastle: parseCastle(castle),
 		enPassant: parseEnPassant(enPassant),
 		fiftyMoveRuleCount: fiftyMoveRuleCountValidator.parse(fiftyMoveRuleCount),
 		moveCount: moveCountValidator.parse(moveCount),
-	});
+	};
 }
 
 const bitboardsKey = {
-	p: Color.White | Piece.Pawn,
-	n: Color.White | Piece.Knight,
-	b: Color.White | Piece.Bishop,
-	r: Color.White | Piece.Rook,
-	q: Color.White | Piece.Queen,
-	k: Color.White | Piece.King,
-	P: Color.Black | Piece.Pawn,
-	N: Color.Black | Piece.Knight,
-	B: Color.Black | Piece.Bishop,
-	R: Color.Black | Piece.Rook,
-	Q: Color.Black | Piece.Queen,
-	K: Color.Black | Piece.King,
+	P: Piece.WhitePawn,
+	N: Piece.WhiteKnight,
+	B: Piece.WhiteBishop,
+	R: Piece.WhiteRook,
+	Q: Piece.WhiteQueen,
+	K: Piece.WhiteKing,
+	p: Piece.BlackPawn,
+	n: Piece.BlackKnight,
+	b: Piece.BlackBishop,
+	r: Piece.BlackRook,
+	q: Piece.BlackQueen,
+	k: Piece.BlackKing,
+};
+
+const castleKey = {
+	k: Castle.BlackKingSide,
+	q: Castle.BlackQueenSide,
+	K: Castle.WhiteKingSide,
+	Q: Castle.WhiteQueenSide,
 };
 
 function parseBoard(boardStr: string) {
@@ -55,15 +63,16 @@ function parseBoard(boardStr: string) {
 	const board = new Board();
 	let position = 0;
 	for (const char of boardStr) {
+		if (char === "/") continue;
+
 		const number = parseInt(char);
 		if (!Number.isNaN(number)) {
 			position += number;
 			continue;
 		}
-		if (char === "/") continue;
 
 		const key = bitboardsKey[char as keyof typeof bitboardsKey]; // se o board for válido podemos assumir isto
-		board.bitboards[key] |= 2n ** BigInt(position);
+		board.bitboards[key] |= 1n << BigInt(position);
 		board.squares[position] = key ?? Piece.None;
 		position += 1;
 	}
@@ -78,7 +87,10 @@ function parseIsWhiteToMove(whoIsToPlay: string) {
 function parseCastle(castle: string) {
 	castleValidator.parse(castle);
 	if (castle === "-") return [];
-	return castle.split("") as Castle[];
+	// podemos dar esse cast já que validamos com regex
+	return (castle.split("") as Array<keyof typeof castleKey>).map(
+		(a) => castleKey[a],
+	) as Castle[];
 }
 
 function parseEnPassant(enPassant: string) {

@@ -1,4 +1,7 @@
+import { SquareInfo } from "../frontend/types";
 import Board from "./board";
+import loadFen from "./fen";
+import Piece from "./piece";
 
 export enum Castle {
 	WhiteKingSide = "k",
@@ -14,6 +17,7 @@ interface GameOptions {
 	fiftyMoveRuleCount: number;
 	moveCount: number;
 	enPassant?: bigint;
+	capturedPieces: Piece[];
 }
 
 const defaultOptions: GameOptions = {
@@ -28,6 +32,7 @@ const defaultOptions: GameOptions = {
 	],
 	fiftyMoveRuleCount: 0,
 	moveCount: 0,
+	capturedPieces: [],
 };
 
 export default class Game {
@@ -37,6 +42,7 @@ export default class Game {
 	fiftyMoveRuleCount: number;
 	moveCount: number;
 	enPassant?: bigint;
+	capturedPieces: Piece[] = [];
 
 	get isBlackToMove() {
 		return !this.isWhiteToMove;
@@ -50,5 +56,29 @@ export default class Game {
 		this.moveCount = calculatedOptions.moveCount;
 		this.fiftyMoveRuleCount = calculatedOptions.fiftyMoveRuleCount;
 		this.enPassant = calculatedOptions.enPassant;
+	}
+
+	static fromFen(fen: string) {
+		return new Game(loadFen(fen));
+	}
+
+	move(from: SquareInfo, to: SquareInfo) {
+		this.board.move(from, to);
+
+		if (this.isBlackToMove) {
+			this.moveCount++;
+			this.fiftyMoveRuleCount++;
+		}
+
+		if (from.piece === Piece.BlackPawn || from.piece === Piece.WhitePawn) {
+			this.fiftyMoveRuleCount = 0;
+		}
+
+		if (to.piece !== Piece.None) {
+			this.fiftyMoveRuleCount = 0;
+			this.capturedPieces.push(to.piece);
+		}
+
+		this.isWhiteToMove = this.isBlackToMove;
 	}
 }
