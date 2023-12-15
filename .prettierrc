@@ -1,8 +1,8 @@
 {
-  "plugins": [
-    "prettier-plugin-organize-imports",
-    "prettier-plugin-packagejson",
-    "prettier-plugin-tailwindcss",
-    "prettier-plugin-vue"
-  ]
+	"plugins": [
+		"prettier-plugin-organize-imports",
+		"prettier-plugin-packagejson",
+		"prettier-plugin-tailwindcss",
+		"prettier-plugin-vue"
+	]
 }
