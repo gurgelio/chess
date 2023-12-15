@@ -16,15 +16,15 @@
 }
 
 .square.odd {
-  background-color: #F0D9B5;
+  background-color: #f0d9b5;
 }
 
 .square.even {
-  background-color: #B58863;
+  background-color: #b58863;
 }
 
 .square.piece-0 {
-  cursor: default
+  cursor: default;
 }
 
 .piece-1 {
