@@ -1,6 +1,6 @@
 import { reactive } from "vue";
-import Game from "../models/game";
-import SquareInfo from "../models/squareInfo";
+import Game from "../../models/game";
+import SquareInfo from "../../models/squareInfo";
 
 interface Store {
 	game: Game;
