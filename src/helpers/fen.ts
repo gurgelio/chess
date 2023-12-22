@@ -1,7 +1,7 @@
 import z from "zod";
-import { Castle } from "../frontend/types";
-import Board from "./board";
-import Piece from "./piece";
+import Castle from "../models/castle";
+import Piece from "../models/piece";
+import Board from "../models/board";
 
 const boardValidator = z
 	.string()
@@ -36,7 +36,7 @@ export default function loadFen(fen: string) {
 	};
 }
 
-const bitboardsKey = {
+const charToPiece = {
 	P: Piece.WhitePawn,
 	N: Piece.WhiteKnight,
 	B: Piece.WhiteBishop,
@@ -60,7 +60,7 @@ const castleKey = {
 
 function parseBoard(boardStr: string) {
 	boardValidator.parse(boardStr);
-	const board = new Board();
+	const squares = new Array<Piece>(64).fill(Piece.None);
 	let position = 0;
 	for (const char of boardStr) {
 		if (char === "/") continue;
@@ -71,12 +71,11 @@ function parseBoard(boardStr: string) {
 			continue;
 		}
 
-		const key = bitboardsKey[char as keyof typeof bitboardsKey]; // se o board for válido podemos assumir isto
-		board.bitboards[key] |= 1n << BigInt(position);
-		board.squares[position] = key ?? Piece.None;
+		const key = charToPiece[char as keyof typeof charToPiece]; // se o board for válido podemos assumir isto
+		squares[position] = key ?? Piece.None;
 		position += 1;
 	}
-	return board;
+	return new Board(squares);
 }
 
 function parseIsWhiteToMove(whoIsToPlay: string) {

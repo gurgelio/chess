@@ -1,14 +1,8 @@
-import { SquareInfo } from "../frontend/types";
+import SquareInfo from "./squareInfo";
 import Board from "./board";
-import loadFen from "./fen";
+import loadFen from "../helpers/fen";
 import Piece from "./piece";
-
-export enum Castle {
-	WhiteKingSide = "k",
-	WhiteQueenSide = "q",
-	BlackKingSide = "K",
-	BlackQueenSide = "Q",
-}
+import Castle from "./castle";
 
 interface GameOptions {
 	board: Board;

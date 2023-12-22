@@ -1,6 +1,6 @@
 import Piece from "./piece";
 
-export interface Move {
+export default interface Move {
 	from: number;
 	to: number;
 	piece: Piece;

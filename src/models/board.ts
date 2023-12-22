@@ -1,16 +1,13 @@
-import { SquareInfo } from "../frontend/types";
+import SquareInfo from "./squareInfo";
 import Piece from "./piece";
 
 export default class Board {
-	bitboards;
+	bitboards = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n];
 	squares: Piece[];
 
-	constructor(
-		bitboards: bigint[] = [0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n, 0n],
-		squares: Piece[] = new Array(64).fill(Piece.None),
-	) {
-		this.bitboards = bitboards;
+	constructor(squares = new Array<Piece>(64).fill(Piece.None)) {
 		this.squares = squares;
+		this.buildBitboards();
 	}
 
 	whiteBitBoard() {
@@ -38,6 +35,12 @@ export default class Board {
 	move(from: SquareInfo, to: SquareInfo) {
 		this.updateBitboards(from, to);
 		this.updateSquares(from, to);
+	}
+
+	private buildBitboards() {
+		for (let position = 0; position < 64; position++) {
+			this.bitboards[this.squares[position]] |= 1n << BigInt(position);
+		}
 	}
 
 	private updateSquares(from: SquareInfo, to: SquareInfo) {

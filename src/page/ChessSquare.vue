@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Piece from "../backend/piece";
+import Piece from "../models/piece";
 import gameStore from "./gameStore";
 
 defineProps<{
